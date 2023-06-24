@@ -184,7 +184,7 @@ pub const BufferBindings = struct {
     vertex_buffer_offsets: [4]u32 = [_]u32{0} ** 4,
     images: [8]Image = [_]Image{0} ** 8,
 
-    pub fn init(index_buffer: Buffer, vert_buffers: []Buffer) BufferBindings {
+    pub fn init(index_buffer: Buffer, vert_buffers: []const Buffer) BufferBindings {
         var vbuffers: [4]Buffer = [_]Buffer{0} ** 4;
         for (vert_buffers, 0..) |vb, i| vbuffers[i] = vb;
 
