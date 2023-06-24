@@ -183,10 +183,10 @@ pub fn setRenderState(state: types.RenderState) void {
     }
 
     if (state.blend.color_write_mask != pip_cache.blend.color_write_mask) {
-        const r = (@enumToInt(state.blend.color_write_mask) & @enumToInt(types.ColorMask.r)) != 0;
-        const g = (@enumToInt(state.blend.color_write_mask) & @enumToInt(types.ColorMask.g)) != 0;
-        const b = (@enumToInt(state.blend.color_write_mask) & @enumToInt(types.ColorMask.b)) != 0;
-        const a = (@enumToInt(state.blend.color_write_mask) & @enumToInt(types.ColorMask.a)) != 0;
+        const r = (@intFromEnum(state.blend.color_write_mask) & @intFromEnum(types.ColorMask.r)) != 0;
+        const g = (@intFromEnum(state.blend.color_write_mask) & @intFromEnum(types.ColorMask.g)) != 0;
+        const b = (@intFromEnum(state.blend.color_write_mask) & @intFromEnum(types.ColorMask.b)) != 0;
+        const a = (@intFromEnum(state.blend.color_write_mask) & @intFromEnum(types.ColorMask.a)) != 0;
         gl.colorMask(if (r) 1 else 0, if (g) 1 else 0, if (b) 1 else 0, if (a) 1 else 0);
         pip_cache.blend.color_write_mask = state.blend.color_write_mask;
     }
@@ -490,7 +490,7 @@ pub fn createBuffer(comptime T: type, desc: descriptions.BufferDesc(T)) types.Bu
                                 switch (type_info.bits) {
                                     32 => {
                                         // u32 is color
-                                        const off = if (offset) |o| @intToPtr(*anyopaque, o) else null;
+                                        const off = if (offset) |o| @ptrFromInt(*anyopaque, o) else null;
                                         gl.vertexAttribPointer(attr_index.*, 4, gl.UNSIGNED_BYTE, gl.TRUE, @sizeOf(T), off);
                                         gl.enableVertexAttribArray(attr_index.*);
                                         gl.vertexAttribDivisor(attr_index.*, step_func);
@@ -512,7 +512,7 @@ pub fn createBuffer(comptime T: type, desc: descriptions.BufferDesc(T)) types.Bu
                                 .Float => {
                                     switch (type_info.fields.len) {
                                         2, 3, 4 => {
-                                            const off = if (offset) |o| @intToPtr(*anyopaque, o) else null;
+                                            const off = if (offset) |o| @ptrFromInt(*anyopaque, o) else null;
                                             gl.vertexAttribPointer(attr_index.*, type_info.fields.len, gl.FLOAT, gl.FALSE, @sizeOf(T), off);
                                             gl.enableVertexAttribArray(attr_index.*);
                                             gl.vertexAttribDivisor(attr_index.*, step_func);
@@ -640,9 +640,9 @@ pub fn draw(base_element: c_int, element_count: c_int, instance_count: c_int) vo
         var ib_offset = @intCast(usize, base_element * i_size + cur_ib_offset);
 
         if (instance_count <= 1) {
-            gl.drawElements(gl.TRIANGLES, element_count, ibuffer.index_buffer_type, @intToPtr(?*anyopaque, ib_offset));
+            gl.drawElements(gl.TRIANGLES, element_count, ibuffer.index_buffer_type, @ptrFromInt(?*anyopaque, ib_offset));
         } else {
-            gl.drawElementsInstanced(gl.TRIANGLES, element_count, ibuffer.index_buffer_type, @intToPtr(?*anyopaque, ib_offset), instance_count);
+            gl.drawElementsInstanced(gl.TRIANGLES, element_count, ibuffer.index_buffer_type, @ptrFromInt(?*anyopaque, ib_offset), instance_count);
         }
     }
 }
