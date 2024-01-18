@@ -189,7 +189,7 @@ pub const ShaderCompileStep = struct {
         const rel_path_len = relative_path_from_package_to_shaders.len;
         if (rel_path_len > 0 and relative_path_from_package_to_shaders[rel_path_len - 1] != path.sep) {
             const with_sep = try self.builder.allocator.alloc(u8, rel_path_len + 1);
-            std.mem.copy(u8, with_sep, relative_path_from_package_to_shaders);
+            @memcpy(with_sep, relative_path_from_package_to_shaders);
             with_sep[rel_path_len] = '/';
             relative_path_from_package_to_shaders = with_sep;
         }
@@ -206,7 +206,7 @@ pub const ShaderCompileStep = struct {
                 replace_with[replace_with.len - 1] = std.ascii.toUpper(replace_with[replace_with.len - 1]);
                 replace_with = replace_with[1..];
 
-                var buffer = try self.builder.allocator.alloc(u8, std.mem.replacementSize(u8, name, to_replace, replace_with));
+                const buffer = try self.builder.allocator.alloc(u8, std.mem.replacementSize(u8, name, to_replace, replace_with));
                 _ = std.mem.replace(u8, name, to_replace, replace_with, buffer);
                 name = buffer;
             }

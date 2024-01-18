@@ -174,7 +174,7 @@ pub const UniformBlock = struct {
     pub fn init(allocator: std.mem.Allocator, line: []const u8) !UniformBlock {
         var colon_index = std.mem.indexOfScalar(u8, line, ':').? + 2;
         var comma_index = std.mem.indexOfScalarPos(u8, line, colon_index, ',').?;
-        var name = line[colon_index..comma_index];
+        const name = line[colon_index..comma_index];
 
         var str = line[comma_index..];
         colon_index = std.mem.indexOfScalar(u8, str, ':').? + 2;
@@ -370,9 +370,9 @@ pub const ShdcParser = struct {
                 if (std.mem.indexOf(u8, line_trimmed, "snippet") != null) {
                     parse_state = .none;
                 } else if (!std.mem.endsWith(u8, line_trimmed, "types:")) { // skip the first one, which doesnt have a type map
-                    var colon_index = std.mem.indexOfScalar(u8, line_trimmed, ':').?;
+                    const colon_index = std.mem.indexOfScalar(u8, line_trimmed, ':').?;
                     const name = std.mem.trim(u8, line_trimmed[0..colon_index], " \n\t");
-                    var replacement = line_trimmed[colon_index + 2 ..];
+                    const replacement = line_trimmed[colon_index + 2 ..];
 
                     if (std.mem.eql(u8, name, "vec2")) {
                         self.float2_type = try self.allocator.dupe(u8, replacement);

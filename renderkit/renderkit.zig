@@ -62,7 +62,7 @@ pub fn shutdown() void {
 fn checkError(src: std.builtin.SourceLocation) void {
     var err_code: GLenum = gl.getError();
     while (err_code != gl.NO_ERROR) {
-        var error_name = switch (err_code) {
+        const error_name = switch (err_code) {
             gl.INVALID_ENUM => "GL_INVALID_ENUM",
             gl.INVALID_VALUE => "GL_INVALID_VALUE",
             gl.INVALID_OPERATION => "GL_INVALID_OPERATION",
@@ -294,7 +294,7 @@ pub fn destroyImage(image: types.Image) void {
 }
 
 pub fn updateImage(comptime T: type, image: types.Image, content: []const T) void {
-    var img = image_cache.get(image);
+    const img = image_cache.get(image);
 
     cache.bindImage(img.tid, 0);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, img.width, img.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, content.ptr);
@@ -601,7 +601,7 @@ pub fn applyBindings(bindings: types.BufferBindings) void {
     cur_bindings = bindings;
 
     if (bindings.index_buffer != 0) {
-        var ibuffer = buffer_cache.get(bindings.index_buffer);
+        const ibuffer = buffer_cache.get(bindings.index_buffer);
         cache.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer.vbo);
         cur_ib_offset = @as(c_int, @intCast(bindings.index_buffer_offset));
     }
@@ -610,7 +610,7 @@ pub fn applyBindings(bindings: types.BufferBindings) void {
     for (bindings.vert_buffers, 0..) |buff, i| {
         if (buff == 0) break;
 
-        var vbuffer = buffer_cache.get(buff);
+        const vbuffer = buffer_cache.get(buff);
         if (vbuffer.setVertexAttributes) |setter| {
             cache.bindBuffer(gl.ARRAY_BUFFER, vbuffer.vbo);
             setter(&vert_attr_index, vbuffer.vert_buffer_step_func, bindings.vertex_buffer_offsets[i]);
@@ -637,7 +637,7 @@ pub fn draw(base_element: c_int, element_count: c_int, instance_count: c_int) vo
         const ibuffer = buffer_cache.get(cur_bindings.index_buffer);
 
         const i_size: c_int = if (ibuffer.index_buffer_type == gl.UNSIGNED_SHORT) 2 else 4;
-        var ib_offset = @as(usize, @intCast(base_element * i_size + cur_ib_offset));
+        const ib_offset = @as(usize, @intCast(base_element * i_size + cur_ib_offset));
 
         if (instance_count <= 1) {
             gl.drawElements(gl.TRIANGLES, element_count, ibuffer.index_buffer_type, @as(?*anyopaque, @ptrFromInt(ib_offset)));
@@ -769,7 +769,7 @@ pub fn setShaderProgramUniformBlock(comptime UniformT: type, shader: types.Shade
             const uni = @field(UniformT.metadata.uniforms, field.name);
 
             // we only support f32s so just get a pointer to the struct reinterpreted as an []f32
-            var f32_slice = std.mem.bytesAsSlice(f32, std.mem.asBytes(value));
+            const f32_slice = std.mem.bytesAsSlice(f32, std.mem.asBytes(value));
             switch (@field(uni, "type")) {
                 .float => gl.uniform1fv(location, @field(uni, "array_count"), f32_slice.ptr),
                 .float2 => gl.uniform2fv(location, @field(uni, "array_count"), f32_slice.ptr),
@@ -791,7 +791,7 @@ pub fn setShaderProgramUniformBlock(comptime UniformT: type, shader: types.Shade
                         switch (@typeInfo(type_info.fields[0].field_type)) {
                             .Array => |array_ti| {
                                 const struct_value = @field(value, field.name);
-                                var array_value = &@field(struct_value, type_info.fields[0].name);
+                                const array_value = &@field(struct_value, type_info.fields[0].name);
                                 switch (array_ti.len) {
                                     6 => gl.uniformMatrix3x2fv(location, 1, gl.FALSE, array_value),
                                     9 => gl.uniformMatrix3fv(location, 1, gl.FALSE, array_value),
@@ -800,7 +800,7 @@ pub fn setShaderProgramUniformBlock(comptime UniformT: type, shader: types.Shade
                             },
                             .Float => {
                                 const struct_value = @field(value, field.name);
-                                var struct_field_value = &@field(struct_value, type_info.fields[0].name);
+                                const struct_field_value = &@field(struct_value, type_info.fields[0].name);
                                 switch (type_info.fields.len) {
                                     2 => gl.uniform2fv(location, 1, struct_field_value),
                                     3 => gl.uniform3fv(location, 1, struct_field_value),

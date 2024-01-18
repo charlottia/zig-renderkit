@@ -128,7 +128,7 @@ pub const RenderCache = struct {
 
     pub fn scissor(self: *@This(), x: c_int, y: c_int, width: c_int, height: c_int, cur_pass_h: c_int) void {
         if (self.scissor_rect.changed(x, y, width, height)) {
-            var y_tl = cur_pass_h - (y + height);
+            const y_tl = cur_pass_h - (y + height);
             gl.scissor(x, y_tl, width, height);
         }
     }

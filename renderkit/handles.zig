@@ -110,7 +110,7 @@ pub fn HandledCache(comptime T: type) type {
         }
 
         pub fn append(self: *@This(), item: T) HandleType {
-            var handle = self.handles.create();
+            const handle = self.handles.create();
             self.items[self.handles.extractIndex(handle)] = item;
             return handle;
         }
@@ -122,7 +122,7 @@ pub fn HandledCache(comptime T: type) type {
 
         pub fn free(self: *@This(), handle: HandleType) *T {
             std.debug.assert(self.handles.alive(handle));
-            var obj = &self.items[self.handles.extractIndex(handle)];
+            const obj = &self.items[self.handles.extractIndex(handle)];
             self.handles.destroy(handle);
             return obj;
         }
